@@ -3,6 +3,7 @@ import React from "react";
 import _ from "lodash";
 import Categorical from "./categorical/categorical";
 import Continuous from "./continuous/continuous";
+import GeneExpression from "./geneExpression/";
 import ExpressionButtons from "./expression/expressionButtons";
 import { connect } from "react-redux";
 import Heatmap from "./expression/diffExpHeatmap";
@@ -17,7 +18,7 @@ import DynamicScatterplot from "./scatterplot/scatterplot";
 class LeftSideBar extends React.Component {
   constructor(props) {
     super(props);
-    this.metadataSectionPadding = 300;
+    this.metadataSectionPadding = 88; /* fragile, if CELLxGENE logo or tabs change, this must as well */
     this.state = {
       currentTab: "metadata"
     };
@@ -92,14 +93,17 @@ class LeftSideBar extends React.Component {
           }}
         >
           {this.state.currentTab === "metadata" ? <Categorical /> : null}
+          {this.state.currentTab === "metadata" ? <GeneExpression /> : null}
           {this.state.currentTab === "metadata" ? <Continuous /> : null}
           {this.state.currentTab === "expression" ? <Heatmap /> : null}
         </div>
         <div style={{ position: "fixed", bottom: 0, left: 0 }}>
-          {this.state.currentTab === "metadata" ? <ExpressionButtons /> : null}
           {this.state.currentTab === "expression" ? (
             <DynamicScatterplot />
           ) : null}
+        </div>
+        <div style={{ position: "fixed", bottom: 0, right: 0 }}>
+          {this.state.currentTab === "metadata" ? <ExpressionButtons /> : null}
         </div>
       </div>
     );

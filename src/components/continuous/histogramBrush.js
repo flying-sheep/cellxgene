@@ -11,7 +11,6 @@ import FaPaintBrush from "react-icons/lib/fa/paint-brush";
 import * as globals from "../../globals";
 
 @connect(state => {
-  console.log("state in histo brush", state)
   const ranges =
     state.cells.cells && state.cells.cells.data.ranges
       ? state.cells.cells.data.ranges
@@ -113,8 +112,7 @@ class HistogramBrush extends React.Component {
     const bins = this.histogramCache.bins;
     const numValues = this.histogramCache.numValues;
 
-    d3
-      .select(svgRef)
+    d3.select(svgRef)
       .insert("g", "*")
       .attr("fill", "#bbb")
       .selectAll("rect")
@@ -172,7 +170,9 @@ class HistogramBrush extends React.Component {
     this.props.dispatch({
       type: "color by continuous metadata",
       colorAccessor: this.props.metadataField,
-      rangeMaxForColorAccessor: this.props.initializeRanges[this.props.metadataField].range.max
+      rangeMaxForColorAccessor: this.props.initializeRanges[
+        this.props.metadataField
+      ].range.max
     });
   }
   render() {

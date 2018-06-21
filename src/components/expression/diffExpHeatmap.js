@@ -6,7 +6,6 @@ import * as globals from "../../globals";
 import styles from "./expression.css";
 import SectionHeader from "../framework/sectionHeader";
 import actions from "../../actions";
-import ReactAutocomplete from "react-autocomplete"; /* http://emilebres.github.io/react-virtualized-checkbox/ */
 import getContrast from "font-color-contrast"; // https://www.npmjs.com/package/font-color-contrast
 import FaPaintBrush from "react-icons/lib/fa/paint-brush";
 
@@ -121,15 +120,13 @@ class HeatmapRow extends React.Component {
           style={{
             fontSize: 12,
             marginLeft: 10,
-            marginRight: 10,
+            marginRight: 10
           }}
         >
           {this.props.aveDiff.toFixed(2)}
         </span>
         <span
-          onClick={this.handleSetGeneAsScatterplotX(this.props.gene).bind(
-            this
-          )}
+          onClick={this.handleSetGeneAsScatterplotX(this.props.gene).bind(this)}
           style={{
             fontSize: 16,
             color:
@@ -152,9 +149,7 @@ class HeatmapRow extends React.Component {
           X
         </span>
         <span
-          onClick={this.handleSetGeneAsScatterplotY(this.props.gene).bind(
-            this
-          )}
+          onClick={this.handleSetGeneAsScatterplotY(this.props.gene).bind(this)}
           style={{
             fontSize: 16,
             color:
@@ -246,30 +241,6 @@ class Heatmap extends React.Component {
 
     return (
       <div>
-        Color by any gene:
-        <ReactAutocomplete
-          items={this.props.allGeneNames}
-          shouldItemRender={(item, value) =>
-            item.toLowerCase().indexOf(value.toLowerCase()) > -1
-          }
-          getItemValue={item => item}
-          renderItem={(item, highlighted) => (
-            <div
-              key={item}
-              style={{ backgroundColor: highlighted ? "#eee" : "transparent" }}
-            >
-              {item}
-            </div>
-          )}
-          value={this.state.value}
-          onChange={e => this.setState({ value: e.target.value })}
-          onSelect={value => {
-            this.setState({ value });
-            this.props.dispatch(
-              actions.requestSingleGeneExpressionCountsForColoringPOST(value)
-            );
-          }}
-        />
         <div
           style={{
             display: "flex",

@@ -35,6 +35,8 @@ class Graph extends React.Component {
     this.count = 0;
     this.inverse = mat4.identity([]);
     this.graphPaddingTop = 100;
+    this.graphPaddingBottom = 45;
+    this.graphPaddingRight = 10;
     this.renderCache = {
       positions: null,
       colors: null
@@ -164,8 +166,7 @@ class Graph extends React.Component {
       nextProps.responsive.width !== this.props.responsive.width
     ) {
       /* clear out whatever was on the div, even if nothing, but usually the brushes etc */
-      d3
-        .select("#graphAttachPoint")
+      d3.select("#graphAttachPoint")
         .selectAll("*")
         .remove();
       const { svg } = setupSVGandBrushElements(
@@ -199,7 +200,8 @@ class Graph extends React.Component {
     // transform screen coordinates -> cell coordinates
     const invert = pin => {
       const x =
-        2 * pin[0] / (this.props.responsive.height - this.graphPaddingTop) - 1;
+        (2 * pin[0]) / (this.props.responsive.height - this.graphPaddingTop) -
+        1;
       const y =
         2 *
           (1 - pin[1] / (this.props.responsive.height - this.graphPaddingTop)) -
@@ -250,9 +252,10 @@ class Graph extends React.Component {
               }}
               style={{
                 fontSize: 14,
-                fontWeight: 700,
+                fontWeight: 400,
                 color: "white",
-                padding: "10px 20px",
+                padding: "0px 10px",
+                height: 30,
                 marginRight: 10,
                 borderRadius: 2,
                 backgroundColor: globals.brightBlue,
@@ -268,10 +271,11 @@ class Graph extends React.Component {
               }}
               style={{
                 fontSize: 14,
-                fontWeight: 700,
+                fontWeight: 400,
                 color: "white",
-                padding: "10px 20px",
+                padding: "0px 10px",
                 marginRight: 10,
+                height: 30,
                 borderRadius: 2,
                 backgroundColor: globals.brightBlue,
                 border: "none",
@@ -294,6 +298,7 @@ class Graph extends React.Component {
                         : "1px solid white",
                     backgroundColor: "white",
                     padding: 5,
+                    marginRight: 10,
                     borderRadius: 3
                   }}
                 >
@@ -312,6 +317,7 @@ class Graph extends React.Component {
                         : "1px solid white",
                     backgroundColor: "white",
                     padding: 5,
+                    marginRight: 10,
                     borderRadius: 3
                   }}
                 >
@@ -324,9 +330,11 @@ class Graph extends React.Component {
               <button
                 style={{
                   fontSize: 14,
-                  fontWeight: 700,
+                  borderRadius: 2,
+                  fontWeight: 400,
                   color: "white",
-                  padding: "10px 20px",
+                  padding: "0px 10px",
+                  height: 30,
                   backgroundColor: globals.lightGrey,
                   border: "none",
                   cursor: "pointer"
@@ -339,12 +347,10 @@ class Graph extends React.Component {
         </div>
         <div
           style={{
-            marginRight: 50,
-            marginTop: 50,
             zIndex: -9999,
             position: "fixed",
-            right: 20,
-            bottom: 20
+            right: this.graphPaddingRight,
+            bottom: this.graphPaddingBottom
           }}
         >
           <div
