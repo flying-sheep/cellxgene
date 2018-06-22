@@ -4,14 +4,6 @@
 import React from "react";
 import _ from "lodash";
 import { connect } from "react-redux";
-
-import styles from "./parallelCoordinates.css";
-import SectionHeader from "../framework/sectionHeader";
-
-import setupParallelCoordinates from "./setupParallelCoordinates";
-import drawAxes from "./drawAxes";
-import drawLinesCanvas from "./drawLinesCanvas";
-
 import HistogramBrush from "./histogramBrush";
 
 import { margin, width, height, createDimensions } from "./util";
@@ -51,22 +43,14 @@ class Continuous extends React.Component {
       dimensions: null
     };
   }
-  componentDidMount() {}
-  componentWillReceiveProps(nextProps) {}
-
-  componentDidMount() {}
-  handleBrushAction(selection) {
-    this.props.dispatch({
-      type: "continuous selection using parallel coords brushing",
-      data: selection
-    });
-  }
   handleColorAction(key) {
-    this.props.dispatch({
-      type: "color by continuous metadata",
-      colorAccessor: key,
-      rangeMaxForColorAccessor: this.props.initializeRanges[key].range.max
-    });
+    return () => {
+      this.props.dispatch({
+        type: "color by continuous metadata",
+        colorAccessor: key,
+        rangeMaxForColorAccessor: this.props.initializeRanges[key].range.max
+      });
+    };
   }
 
   render() {
@@ -78,8 +62,9 @@ class Continuous extends React.Component {
             return (
               <HistogramBrush
                 key={key}
-                metadataField={key}
+                field={key}
                 ranges={value.range}
+                handleColorAction={this.handleColorAction(key).bind(this)}
               />
             );
           }
