@@ -66,9 +66,7 @@ class HeatmapRow extends React.Component {
   handleGeneColorScaleClick(gene) {
     return () => {
       this.props.dispatch(
-        actions.requestSingleGeneExpressionCountsForColoringPOST(
-          this.props.gene
-        )
+        actions.requestSingleGeneExpressionCountsPOST(this.props.gene)
       );
     };
   }
@@ -181,10 +179,6 @@ class HeatmapRow extends React.Component {
             borderRadius: 3,
             padding: "0px 2px 2px 2px",
             color:
-              this.props.colorAccessor === this.props.gene
-                ? "white"
-                : "inherit",
-            backgroundColor:
               this.props.colorAccessor === this.props.gene
                 ? globals.brightBlue
                 : "inherit"
