@@ -12,6 +12,7 @@ import expression from "./expression";
 import controls from "./controls";
 import differential from "./differential";
 import responsive from "./responsive";
+import userDefinedGenes from "./userDefinedGenes";
 
 const Reducer = combineReducers({
   initialize,
@@ -19,7 +20,8 @@ const Reducer = combineReducers({
   expression,
   controls,
   differential,
-  responsive
+  responsive,
+  userDefinedGenes
 });
 
 let store = createStore(
