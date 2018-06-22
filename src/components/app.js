@@ -84,7 +84,7 @@ class App extends React.Component {
           ""
         )}
         <div>
-          <LeftSideBar />
+          {this.props.cells.loading ? null : <LeftSideBar />}
           <div
             style={{
               padding: 15,
