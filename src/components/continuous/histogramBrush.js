@@ -49,14 +49,15 @@ class HistogramBrush extends React.Component {
       brush: null
     };
   }
-  componentDidMount() {}
-  componentDidUpdate() {}
 
+  componentWillMount() {
+    this.calcHistogramCache(this.props);
+  }
   calcHistogramCache(nextProps) {
-    // recalculate expensive stuff
+    // cache
     const allValuesForContinuousFieldAsArray = _.map(
       nextProps.cellsMetadata,
-      nextProps.metadataField
+      nextProps.field
     );
 
     this.histogramCache.x = d3
@@ -76,31 +77,18 @@ class HistogramBrush extends React.Component {
 
     this.histogramCache.numValues = allValuesForContinuousFieldAsArray.length;
   }
-
-  componentWillMount() {
-    this.calcHistogramCache(this.props);
-  }
-  componentWillReceiveProps(nextProps) {
-    if (
-      this.props.metadataField !== nextProps.metadataField ||
-      !this.histogramCache.x
-    ) {
-      this.calcHistogramCache(nextProps);
-    }
-  }
-
   onBrush(selection, x) {
     return () => {
       if (d3.event.selection) {
         this.props.dispatch({
           type: "continuous metadata histogram brush",
-          selection: this.props.metadataField,
+          selection: this.props.field,
           range: [x(d3.event.selection[0]), x(d3.event.selection[1])]
         });
       } else {
         this.props.dispatch({
           type: "continuous metadata histogram brush",
-          selection: this.props.metadataField,
+          selection: this.props.field,
           range: null
         });
       }
@@ -112,7 +100,8 @@ class HistogramBrush extends React.Component {
     const bins = this.histogramCache.bins;
     const numValues = this.histogramCache.numValues;
 
-    d3.select(svgRef)
+    d3
+      .select(svgRef)
       .insert("g", "*")
       .attr("fill", "#bbb")
       .selectAll("rect")
@@ -140,10 +129,7 @@ class HistogramBrush extends React.Component {
         .call(
           d3
             .brushX()
-            .on(
-              "end",
-              this.onBrush(this.props.metadataField, x.invert).bind(this)
-            )
+            .on("end", this.onBrush(this.props.field, x.invert).bind(this))
         );
 
       const xAxis = d3
@@ -161,38 +147,29 @@ class HistogramBrush extends React.Component {
         .attr("fill", "#000")
         .attr("text-anchor", "end")
         .attr("font-weight", "bold")
-        .text(this.props.metadataField);
+        .text(this.props.field);
 
       this.setState({ brush, xAxis });
     }
-  }
-  handleColorAction() {
-    this.props.dispatch({
-      type: "color by continuous metadata",
-      colorAccessor: this.props.metadataField,
-      rangeMaxForColorAccessor: this.props.initializeRanges[
-        this.props.metadataField
-      ].range.max
-    });
   }
   render() {
     return (
       <div
         style={{ marginTop: 10, position: "relative" }}
-        id={"histogram_" + this.props.metadataField}
+        id={"histogram_" + this.props.field}
       >
         <span
-          onClick={this.handleColorAction.bind(this)}
+          onClick={this.props.handleColorAction}
           style={{
             fontSize: 16,
             marginLeft: 4,
-            // padding: this.props.colorAccessor === this.props.metadataField ? 3 : "auto",
+            // padding: this.props.colorAccessor === this.props.field ? 3 : "auto",
             borderRadius: 3,
             color:
-              this.props.colorAccessor === this.props.metadataField
+              this.props.colorAccessor === this.props.field
                 ? globals.brightBlue
                 : "black",
-            // backgroundColor: this.props.colorAccessor === this.props.metadataField ? globals.brightBlue : "inherit",
+            // backgroundColor: this.props.colorAccessor === this.props.field ? globals.brightBlue : "inherit",
             display: "inline-block",
             position: "relative",
             left: this.width,
@@ -208,11 +185,7 @@ class HistogramBrush extends React.Component {
           ref={svgRef => {
             this.drawHistogram(svgRef);
           }}
-        >
-          {this.props.ranges.min}
-          {" to "}
-          {this.props.ranges.max}
-        </svg>
+        />
       </div>
     );
   }

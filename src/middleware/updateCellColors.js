@@ -74,37 +74,13 @@ const updateCellColorsMiddleware = store => {
       }
 
       if (action.type === "color by expression") {
-        const indexOfGene = 0; /* we only get one, this comes from server as needed now */
-
-        const expressionMap = {};
-        /*
-          converts [{cellname: cell123, e}, {}]
-
-          expressionMap = {
-            cell123: [123, 2],
-            cell789: [0, 8]
-          }
-        */
-        _.each(action.data.data.cells, cell => {
-          /* this action is coming directly from the server */
-          expressionMap[cell.cellname] = cell.e;
-        });
-
-        const minExpressionCell = _.minBy(action.data.data.cells, cell => {
-          return cell.e[indexOfGene];
-        });
-
-        const maxExpressionCell = _.maxBy(action.data.data.cells, cell => {
-          return cell.e[indexOfGene];
-        });
-
         // console.log('middle', action, expressionMap, minExpressionCell)
 
         colorScale = d3
           .scaleLinear()
           .domain([
-            minExpressionCell.e[indexOfGene],
-            maxExpressionCell.e[indexOfGene]
+            action.minExpressionCell.e[action.indexOfGene],
+            action.maxExpressionCell.e[action.indexOfGene]
           ])
           .range([
             1,
@@ -113,7 +89,7 @@ const updateCellColorsMiddleware = store => {
 
         _.each(cellsMetadataWithUpdatedColors, (cell, i) => {
           let c = d3.interpolateViridis(
-            colorScale(expressionMap[cell.CellName][indexOfGene])
+            colorScale(action.expressionMap[cell.CellName][action.indexOfGene])
           );
           cellsMetadataWithUpdatedColors[i]["__color__"] = c;
           cellsMetadataWithUpdatedColors[i]["__colorRGB__"] = parseRGB(c);

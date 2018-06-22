@@ -128,7 +128,7 @@ const requestGeneExpressionCounts = () => {
   };
 };
 
-const requestSingleGeneExpressionCountsForColoringPOST = gene => {
+const requestSingleGeneExpressionCountsPOST = gene => {
   return (dispatch, getState) => {
     dispatch({ type: "get single gene expression for coloring started" });
     fetch(`${globals.API.prefix}${globals.API.version}expression`, {
@@ -144,15 +144,75 @@ const requestSingleGeneExpressionCountsForColoringPOST = gene => {
       .then(res => res.json())
       .then(data => cleanupExpressionResponse(data))
       .then(
-        data =>
+        data => {
+          const indexOfGene = 0; /* we only get one, this comes from server as needed now */
+
+          const expressionMap = {};
+          /*
+            converts [{cellname: cell123, e}, ...]
+
+            expressionMap = {
+              cell123: [123, 2],
+              cell789: [0, 8]
+            }
+          */
+          _.each(data.data.cells, cell => {
+            /* this action is coming directly from the server */
+            expressionMap[cell.cellname] = cell.e;
+          });
+
+          const minExpressionCell = _.minBy(data.data.cells, cell => {
+            return cell.e[indexOfGene];
+          });
+
+          const maxExpressionCell = _.maxBy(data.data.cells, cell => {
+            return cell.e[indexOfGene];
+          });
           dispatch({
             type: "color by expression",
+            gene: gene,
+            data,
+            expressionMap,
+            minExpressionCell,
+            maxExpressionCell,
+            indexOfGene
+          });
+        },
+        error =>
+          dispatch({
+            type: "get single gene expression for coloring error",
+            error
+          })
+      );
+  };
+};
+
+const addUserDefinedGene = gene => {
+  return (dispatch, getState) => {
+    dispatch({ type: "getting user defined gene started" });
+    /* same api call as requestSingleGene... could be composed */
+    fetch(`${globals.API.prefix}${globals.API.version}expression`, {
+      method: "POST",
+      body: JSON.stringify({
+        genelist: [gene]
+      }),
+      headers: new Headers({
+        accept: "application/json",
+        "Content-Type": "application/json"
+      })
+    })
+      .then(res => res.json())
+      .then(data => cleanupExpressionResponse(data))
+      .then(
+        data =>
+          dispatch({
+            type: "add user defined gene",
             gene: gene,
             data
           }),
         error =>
           dispatch({
-            type: "get single gene expression for coloring error",
+            type: "add user defined gene error",
             error
           })
       );
@@ -227,6 +287,7 @@ export default {
   resetGraph,
   requestGeneExpressionCounts,
   requestGeneExpressionCountsPOST,
-  requestSingleGeneExpressionCountsForColoringPOST,
-  requestDifferentialExpression
+  requestSingleGeneExpressionCountsPOST,
+  requestDifferentialExpression,
+  addUserDefinedGene
 };

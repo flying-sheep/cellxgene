@@ -7,7 +7,7 @@ import { connect } from "react-redux";
 import HistogramBrush from "../continuous/histogramBrush";
 import CirclePlus from "react-icons/lib/fa/plus-circle";
 import * as globals from "../../globals";
-import ReactAutocomplete from "react-autocomplete"; /* http://emilebres.github.io/react-virtualized-checkbox/ */
+// import ReactAutocomplete from "react-autocomplete"; /* http://emilebres.github.io/react-virtualized-checkbox/ */
 import actions from "../../actions/";
 
 @connect(state => {
@@ -29,22 +29,22 @@ import actions from "../../actions/";
     ranges,
     metadata,
     initializeRanges,
+    userDefinedGenes: state.userDefinedGenes,
     colorAccessor: state.controls.colorAccessor,
     allGeneNames: state.controls.allGeneNames
   };
 })
-class Continuous extends React.Component {
+class GeneExpression extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       svg: null,
       ctx: null,
       axes: null,
-      dimensions: null
+      dimensions: null,
+      gene: null
     };
   }
-  componentDidMount() {}
-  componentWillReceiveProps(nextProps) {}
 
   componentDidMount() {}
   handleBrushAction(selection) {
@@ -54,70 +54,121 @@ class Continuous extends React.Component {
     });
   }
   handleColorAction(key) {
-    this.props.dispatch({
-      type: "color by continuous metadata",
-      colorAccessor: key,
-      rangeMaxForColorAccessor: this.props.initializeRanges[key].range.max
-    });
+    return () => {};
+    const indexOfGene = 0; /* we only get one, this comes from server as needed now */
+
+    const expressionMap = {};
+    /*
+      converts [{cellname: cell123, e}, ...]
+
+      expressionMap = {
+        cell123: [123, 2],
+        cell789: [0, 8]
+      }
+    */
+    // _.each(data.data.cells, cell => {
+    //   /* this action is coming directly from the server */
+    //   expressionMap[cell.cellname] = cell.e;
+    // });
+    //
+    // const minExpressionCell = _.minBy(data.data.cells, cell => {
+    //   return cell.e[indexOfGene];
+    // });
+    //
+    // const maxExpressionCell = _.maxBy(data.data.cells, cell => {
+    //   return cell.e[indexOfGene];
+    // });
+    // dispatch({
+    // type: "color by expression"
+    //   gene: gene,
+    //   colorAccessor: gene,
+    //   data,
+    //   expressionMap,
+    //   minExpressionCell,
+    //   maxExpressionCell,
+    //   indexOfGene
+    // });
   }
 
   render() {
+    console.log("expression", this.props);
     return (
       <div>
-        {this.props.allGeneNames ? (
-          <button
+        <input
+          onChange={e => {
+            this.setState({ gene: e.target.value });
+          }}
+          type="text"
+        />
+        <button
+          style={{
+            border: "none",
+            background: "none",
+            cursor: "pointer",
+            outline: "none",
+            margin: "none",
+            padding: 0
+          }}
+          onClick={() => {
+            this.props.dispatch(actions.addUserDefinedGene(this.state.gene));
+          }}
+        >
+          <CirclePlus
             style={{
-              border: "none",
-              background: "none",
-              cursor: "pointer",
-              outline: "none",
-              margin: "none",
-              padding: 0
+              display: "inline-block",
+              color: globals.brightBlue,
+              fontSize: 22
             }}
-          >
-            <ReactAutocomplete
-              items={this.props.allGeneNames}
-              shouldItemRender={(item, value) =>
-                item.toLowerCase().indexOf(value.toLowerCase()) > -1
-              }
-              getItemValue={item => item}
-              renderItem={(item, highlighted) => (
-                <div
-                  key={item}
-                  style={{
-                    backgroundColor: highlighted ? "#eee" : "transparent"
-                  }}
-                >
-                  {item}
-                </div>
-              )}
-              value={this.state.value}
-              onChange={e => this.setState({ value: e.target.value })}
-              onSelect={value => {
-                this.setState({ value });
-                this.props.dispatch(
-                  actions.requestSingleGeneExpressionCountsForColoringPOST(
-                    value
-                  )
-                );
-              }}
+          />{" "}
+          add gene{" "}
+        </button>
+        {_.map(this.props.userDefinedGenes.genes, (value, key) => {
+          console.log("valuekey", value, key);
+          return (
+            <HistogramBrush
+              key={key}
+              field={key}
+              ranges={d3.extent(value, d => {
+                d.e[0];
+              })}
+              handleColorAction={this.handleColorAction(key).bind(this)}
             />
-            <CirclePlus
-              style={{
-                display: "inline-block",
-                color: globals.brightBlue,
-                fontSize: 22
-              }}
-            />{" "}
-            add gene{" "}
-          </button>
-        ) : null}
+          );
+        })}
       </div>
     );
   }
 }
 
-export default Continuous;
+export default GeneExpression;
+
+// <ReactAutocomplete
+//   items={this.props.allGeneNames}
+//   shouldItemRender={(item, value) =>
+//     item.toLowerCase().indexOf(value.toLowerCase()) > -1
+//   }
+//   getItemValue={item => item}
+//   renderItem={(item, highlighted) => (
+//     <div
+//       key={item}
+//       style={{
+//         backgroundColor: highlighted ? "#eee" : "transparent"
+//       }}
+//     >
+//       {item}
+//     </div>
+//   )}
+//   value={this.state.value}
+//   onChange={e => this.setState({ value: e.target.value })}
+//   onSelect={value => {
+//     this.setState({ value });
+//     this.props.dispatch(
+//       actions.requestSingleGeneExpressionCountsPOST(
+//         value
+//       )
+//     );
+//   }}
+// />
 
 // <div>
 //   {_.map(this.props.ranges, (value, key) => {
