@@ -7,9 +7,8 @@ import { connect } from "react-redux";
 import PulseLoader from "halogen/PulseLoader";
 
 import LeftSideBar from "./leftsidebar";
-import Parallel from "./continuous/parallel";
+// import Parallel from "./parallelCoords";
 import Legend from "./continuousLegend";
-import Joy from "./joy/joy";
 import Graph from "./graph/graph";
 import * as globals from "../globals";
 import actions from "../actions";
@@ -18,7 +17,8 @@ import SectionHeader from "./framework/sectionHeader";
 
 @connect(state => {
   return {
-    cells: state.cells
+    cells: state.cells,
+    initialize: state.initialize
   };
 })
 class App extends React.Component {
@@ -84,7 +84,9 @@ class App extends React.Component {
           ""
         )}
         <div>
-          {this.props.cells.loading ? null : <LeftSideBar />}
+          {this.props.cells.loading || this.props.initialize.loading ? null : (
+            <LeftSideBar />
+          )}
           <div
             style={{
               padding: 15,
