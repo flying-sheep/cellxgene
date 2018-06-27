@@ -4,7 +4,7 @@
 import React from "react";
 import _ from "lodash";
 import { connect } from "react-redux";
-import HistogramBrush from "./histogramBrush";
+import HistogramBrush from "../brushableHistogram";
 
 import { margin, width, height, createDimensions } from "./util";
 

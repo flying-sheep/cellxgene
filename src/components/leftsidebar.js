@@ -2,8 +2,8 @@
 import React from "react";
 import _ from "lodash";
 import Categorical from "./categorical/categorical";
-import Continuous from "./continuous/continuous";
-import GeneExpression from "./geneExpression/";
+import Continuous from "./continuous";
+import GeneExpression from "./geneExpression";
 import ExpressionButtons from "./expression/expressionButtons";
 import { connect } from "react-redux";
 import Heatmap from "./expression/diffExpHeatmap";

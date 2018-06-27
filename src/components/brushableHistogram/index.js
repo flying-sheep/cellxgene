@@ -9,37 +9,31 @@ import _ from "lodash";
 import { connect } from "react-redux";
 import FaPaintBrush from "react-icons/lib/fa/paint-brush";
 import * as globals from "../../globals";
+import { calcHistogram } from "./util";
+import * as constants from "./constants";
 
 @connect(state => {
-  const ranges =
-    state.cells.cells && state.cells.cells.data.ranges
-      ? state.cells.cells.data.ranges
-      : null;
-  const metadata =
-    state.cells.cells && state.cells.cells.data.metadata
-      ? state.cells.cells.data.metadata
-      : null;
-
   const initializeRanges =
     state.initialize.data && state.initialize.data.data.ranges
       ? state.initialize.data.data.ranges
+      : null;
+
+  const schema =
+    state.initialize.data && state.initialize.data.data.schema
+      ? state.initialize.data.data.schema
       : null;
 
   return {
     colorAccessor: state.controls.colorAccessor,
     colorScale: state.controls.colorScale,
     cellsMetadata: state.controls.cellsMetadata,
-    initializeRanges
+    initializeRanges,
+    schema
   };
 })
 class HistogramBrush extends React.Component {
   constructor(props) {
     super(props);
-
-    this.width = 300;
-    this.height = 100;
-    this.marginBottom = 20;
-    this.histogramCache = {};
 
     this.state = {
       svg: null,
@@ -51,31 +45,46 @@ class HistogramBrush extends React.Component {
   }
 
   componentWillMount() {
-    this.calcHistogramCache(this.props);
-  }
-  calcHistogramCache(nextProps) {
-    // cache
-    const allValuesForContinuousFieldAsArray = _.map(
-      nextProps.cellsMetadata,
-      nextProps.field
-    );
+    /*
+      revisit this function.
 
-    this.histogramCache.x = d3
-      .scaleLinear()
-      .domain([nextProps.ranges.min, nextProps.ranges.max])
-      .range([0, this.width]);
-
-    this.histogramCache.y = d3
-      .scaleLinear()
-      .range([this.height - this.marginBottom, 0]);
-    // .range([height - margin.bottom, margin.top]);
-
-    this.histogramCache.bins = d3
-      .histogram()
-      .domain(this.histogramCache.x.domain())
-      .thresholds(40)(allValuesForContinuousFieldAsArray);
-
-    this.histogramCache.numValues = allValuesForContinuousFieldAsArray.length;
+      this isn't state because it doesn't change... we nuke left side bar and force
+      a remount every time cells changes... if we stop doing that this pattern breaks
+      which could be considered fragile... we could check on update if the length had changed etc
+    */
+    if (this.props.schema[this.props.field]) {
+      /* this is an unfortunate branching spot and could live somewhere else / imply format or componetization changes
+      we could do this above but really don't want to recompute every time... */
+      const allValuesForContinuousFieldAsArray = _.map(
+        this.props.cellsMetadata,
+        this.props.field
+      );
+      console.log("md vals", this.props.ranges);
+      this.histogramData = calcHistogram(
+        this.props.ranges,
+        allValuesForContinuousFieldAsArray
+      );
+    } else {
+      /*
+        we don't have a schema, so... we don't have ranges out of the box
+      */
+      const _ranges = d3.extent(this.props.geneExpressionPerCell, d => {
+        return d.e[0];
+      });
+      const ranges = { max: _ranges[1], min: _ranges[0] };
+      console.log("EXP RANGES", ranges);
+      const allValuesForContinuousFieldAsArray = _.map(
+        this.props.geneExpressionPerCell,
+        d => {
+          return d.e[0].toString();
+        }
+      );
+      console.log("inside range loop", allValuesForContinuousFieldAsArray);
+      this.histogramData = calcHistogram(
+        ranges,
+        allValuesForContinuousFieldAsArray
+      );
+    }
   }
   onBrush(selection, x) {
     return () => {
@@ -95,13 +104,12 @@ class HistogramBrush extends React.Component {
     };
   }
   drawHistogram(svgRef) {
-    const x = this.histogramCache.x;
-    const y = this.histogramCache.y;
-    const bins = this.histogramCache.bins;
-    const numValues = this.histogramCache.numValues;
+    const x = this.histogramData.x;
+    const y = this.histogramData.y;
+    const bins = this.histogramData.bins;
+    const numValues = this.histogramData.numValues;
 
-    d3
-      .select(svgRef)
+    d3.select(svgRef)
       .insert("g", "*")
       .attr("fill", "#bbb")
       .selectAll("rect")
@@ -138,11 +146,11 @@ class HistogramBrush extends React.Component {
         .attr("class", "axis axis--x")
         .attr(
           "transform",
-          "translate(0," + (this.height - this.marginBottom) + ")"
+          "translate(0," + (constants.height - constants.marginBottom) + ")"
         )
         .call(d3.axisBottom(x).ticks(5))
         .append("text")
-        .attr("x", this.width - 2)
+        .attr("x", constants.width - 2)
         .attr("y", -6)
         .attr("fill", "#000")
         .attr("text-anchor", "end")
@@ -172,16 +180,16 @@ class HistogramBrush extends React.Component {
             // backgroundColor: this.props.colorAccessor === this.props.field ? globals.brightBlue : "inherit",
             display: "inline-block",
             position: "relative",
-            left: this.width,
-            top: this.height - 22,
+            left: constants.width,
+            top: constants.height - 22,
             cursor: "pointer"
           }}
         >
           <FaPaintBrush />
         </span>
         <svg
-          width={this.width}
-          height={this.height}
+          width={constants.width}
+          height={constants.height}
           ref={svgRef => {
             this.drawHistogram(svgRef);
           }}
