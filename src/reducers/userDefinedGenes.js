@@ -14,7 +14,6 @@ const UserDefinedGenes = (
         error: null
       });
     case "add user defined gene":
-      console.log("action", action);
       return Object.assign({}, state, {
         error: null,
         loading: false,

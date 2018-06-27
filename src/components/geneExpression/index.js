@@ -4,7 +4,7 @@
 import React from "react";
 import _ from "lodash";
 import { connect } from "react-redux";
-import HistogramBrush from "../continuous/histogramBrush";
+import HistogramBrush from "../brushableHistogram";
 import CirclePlus from "react-icons/lib/fa/plus-circle";
 import * as globals from "../../globals";
 // import ReactAutocomplete from "react-autocomplete"; /* http://emilebres.github.io/react-virtualized-checkbox/ */
@@ -91,7 +91,6 @@ class GeneExpression extends React.Component {
   }
 
   render() {
-    console.log("expression", this.props);
     return (
       <div>
         <input
@@ -123,14 +122,11 @@ class GeneExpression extends React.Component {
           add gene{" "}
         </button>
         {_.map(this.props.userDefinedGenes.genes, (value, key) => {
-          console.log("valuekey", value, key);
           return (
             <HistogramBrush
               key={key}
               field={key}
-              ranges={d3.extent(value, d => {
-                d.e[0];
-              })}
+              geneExpressionPerCell={value}
               handleColorAction={this.handleColorAction(key).bind(this)}
             />
           );

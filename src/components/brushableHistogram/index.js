@@ -59,7 +59,6 @@ class HistogramBrush extends React.Component {
         this.props.cellsMetadata,
         this.props.field
       );
-      console.log("md vals", this.props.ranges);
       this.histogramData = calcHistogram(
         this.props.ranges,
         allValuesForContinuousFieldAsArray
@@ -72,14 +71,12 @@ class HistogramBrush extends React.Component {
         return d.e[0];
       });
       const ranges = { max: _ranges[1], min: _ranges[0] };
-      console.log("EXP RANGES", ranges);
       const allValuesForContinuousFieldAsArray = _.map(
         this.props.geneExpressionPerCell,
         d => {
           return d.e[0].toString();
         }
       );
-      console.log("inside range loop", allValuesForContinuousFieldAsArray);
       this.histogramData = calcHistogram(
         ranges,
         allValuesForContinuousFieldAsArray
