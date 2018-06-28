@@ -108,7 +108,7 @@ class HistogramBrush extends React.Component {
 
     d3.select(svgRef)
       .insert("g", "*")
-      .attr("fill", "#bbb")
+      .attr("fill", globals.brightBlue)
       .selectAll("rect")
       .data(bins)
       .enter()
@@ -153,6 +153,16 @@ class HistogramBrush extends React.Component {
         .attr("text-anchor", "end")
         .attr("font-weight", "bold")
         .text(this.props.field);
+
+      d3.select(svgRef)
+        .selectAll(".axis--x text")
+        .style("fill", "rgb(80,80,80)");
+      d3.select(svgRef)
+        .selectAll(".axis--x path")
+        .style("stroke", "rgb(230,230,230)");
+      d3.select(svgRef)
+        .selectAll(".axis--x line")
+        .style("stroke", "rgb(230,230,230)");
 
       this.setState({ brush, xAxis });
     }
