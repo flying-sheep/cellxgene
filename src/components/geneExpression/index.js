@@ -93,34 +93,41 @@ class GeneExpression extends React.Component {
   render() {
     return (
       <div>
-        <input
-          onChange={e => {
-            this.setState({ gene: e.target.value });
-          }}
-          type="text"
-        />
-        <button
-          style={{
-            border: "none",
-            background: "none",
-            cursor: "pointer",
-            outline: "none",
-            margin: "none",
-            padding: 0
-          }}
-          onClick={() => {
-            this.props.dispatch(actions.addUserDefinedGene(this.state.gene));
-          }}
-        >
-          <CirclePlus
-            style={{
-              display: "inline-block",
-              color: globals.brightBlue,
-              fontSize: 22
+        <div style={{ marginLeft: 5, marginTop: 15 }}>
+          <input
+            onChange={e => {
+              this.setState({ gene: e.target.value });
             }}
-          />{" "}
-          add gene{" "}
-        </button>
+            type="text"
+          />
+          <button
+            style={{
+              border: "none",
+              background: "none",
+              cursor: "pointer",
+              outline: "none",
+              margin: "0px 0px 0px 10px",
+              padding: 0,
+              position: "relative",
+              top: -1
+            }}
+            onClick={() => {
+              this.props.dispatch(actions.addUserDefinedGene(this.state.gene));
+            }}
+          >
+            <CirclePlus
+              style={{
+                display: "inline-block",
+                color: globals.brightBlue,
+                fontSize: 22
+              }}
+            />{" "}
+            <span style={{ position: "relative", top: 1, left: -2 }}>
+              {" "}
+              add gene{" "}
+            </span>
+          </button>
+        </div>
         {_.map(this.props.userDefinedGenes.genes, (value, key) => {
           return (
             <HistogramBrush

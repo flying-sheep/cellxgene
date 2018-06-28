@@ -30,7 +30,7 @@ class Category extends React.Component {
   componentDidUpdate() {
     const valuesAsBool = _.values(
       this.props.categoricalAsBooleansMap[this.props.metadataField]
-    )
+    );
     /* count categories toggled on by counting true values */
     const categoriesToggledOn = _.values(valuesAsBool).filter(v => v).length;
 
@@ -80,13 +80,13 @@ class Category extends React.Component {
     });
   }
   handleToggleAllClick() {
-     // || this.checkbox.indeterminate === false
+    // || this.checkbox.indeterminate === false
     if (this.state.isChecked) {
-      console.log('checked, firing toggle none')
+      console.log("checked, firing toggle none");
       this.toggleNone();
     } else if (!this.state.isChecked) {
-      console.log('!checked, firing toggle all')
-      this.toggleAll()
+      console.log("!checked, firing toggle all");
+      this.toggleAll();
     }
   }
   render() {
@@ -120,7 +120,7 @@ class Category extends React.Component {
                 cursor: "pointer",
                 display: "inline-block",
                 position: "relative",
-                top: 2
+                top: -2
               }}
               onClick={() => {
                 this.setState({ isExpanded: !this.state.isExpanded });
@@ -131,7 +131,7 @@ class Category extends React.Component {
             {this.props.metadataField}
             <input
               onChange={this.handleToggleAllClick.bind(this)}
-              ref={el => this.checkbox = el}
+              ref={el => (this.checkbox = el)}
               checked={this.state.isChecked}
               type="checkbox"
             />
