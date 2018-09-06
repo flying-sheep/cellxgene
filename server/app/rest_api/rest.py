@@ -201,6 +201,43 @@ class AnnotationsObsAPI(Resource):
         else:
             return make_response(jsonify(annotation_response))
 
+    @swagger.doc({
+        "summary": "Fetch annotations (metadata) for filtered subset.",
+        "tags": ["annotations"],
+        # TODO once PUT Layout PR lands, uncomment the next section
+        # I don't want to do complex git magic to get FilterModel
+        # "parameters": [
+        #     {
+        #         'name': 'filter',
+        #         'description': 'Complex Filter',
+        #         'in': 'body',
+        #         'schema': FilterModel
+        #     }
+        # ],
+        "responses": {
+            "200": {
+                "description": "annotations",
+                "examples": {
+                    "application/json": {
+                        "names": [
+                            'tissue_type', 'sex', 'num_reads', 'clusters'
+                        ],
+                        "data": [
+                            [0, 'lung', 'F', 39844, 99],
+                            [1, 'heart', 'M', 83, 1],
+                            [49, 'spleen', None, 2, "unknown cluster"],
+
+                        ]
+                    }
+
+                }
+            }
+        }
+    })
+    def put(self):
+        df = current_app.data.filter_dataframe(request.get_json()["filter"])
+        return make_response(jsonify(current_app.data.annotation(df)))
+
 
 def get_api_resources():
     bp = Blueprint("api", __name__, url_prefix="/api/v0.2")
