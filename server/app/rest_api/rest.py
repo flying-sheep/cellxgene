@@ -204,16 +204,14 @@ class AnnotationsObsAPI(Resource):
     @swagger.doc({
         "summary": "Fetch annotations (metadata) for filtered subset.",
         "tags": ["annotations"],
-        # TODO once PUT Layout PR lands, uncomment the next section
-        # I don't want to do complex git magic to get FilterModel
-        # "parameters": [
-        #     {
-        #         'name': 'filter',
-        #         'description': 'Complex Filter',
-        #         'in': 'body',
-        #         'schema': FilterModel
-        #     }
-        # ],
+        "parameters": [
+            {
+                'name': 'filter',
+                'description': 'Complex Filter',
+                'in': 'body',
+                'schema': FilterModel
+            }
+        ],
         "responses": {
             "200": {
                 "description": "annotations",
